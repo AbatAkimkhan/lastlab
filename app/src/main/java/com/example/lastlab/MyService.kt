@@ -24,7 +24,7 @@ class MyService : Service() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Music Player")
             .setContentText("Music is playing...")
-            .setSmallIcon(R.drawable.ic_music)
+            .setSmallIcon(R.drawable.ic_launcher_background)
             .build()
 
         startForeground(1, notification)
