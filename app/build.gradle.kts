@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -26,17 +26,23 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
+    }
+
+    // ✅ Вот здесь мы включаем View Binding
+    buildFeatures {
+        viewBinding = true
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
