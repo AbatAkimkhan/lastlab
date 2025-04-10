@@ -1,6 +1,5 @@
 package com.example.lastlab
 
-import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
@@ -19,8 +18,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        requestNotificationPermission()
         createNotificationChannel()
+        requestNotificationPermission()
 
         binding.btnStartService.setOnClickListener {
             Log.d("MainActivity", "Start button clicked")
@@ -31,11 +30,11 @@ class MainActivity : AppCompatActivity() {
         binding.btnStopService.setOnClickListener {
             Log.d("MainActivity", "Stop button clicked")
             val intent = Intent(this, MyService::class.java)
-            intent.action = "STOP"
-            startService(intent)
+            stopService(intent)
         }
 
         binding.btnNextActivity.setOnClickListener {
+            Log.d("MainActivity", "Next Activity button clicked")
             val intent = Intent(this, MainActivity2::class.java)
             startActivity(intent)
         }
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", "Creating notification channel")
 
             val channel = NotificationChannel(
-                "music_channel", // ID должен совпадать с MyService
+                "music_channel", // тот же ID, что и в MyService
                 "Музыкальный канал",
                 NotificationManager.IMPORTANCE_LOW
             )
@@ -57,8 +56,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
             }
         }
     }
