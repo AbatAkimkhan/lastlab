@@ -3,52 +3,85 @@ package com.example.lastlab
 import android.app.*
 import android.content.Intent
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
 class MyService : Service() {
 
-    private lateinit var player: MediaPlayer
-    private val CHANNEL_ID = "lastlab_channel"
+    private lateinit var mediaPlayer: MediaPlayer
+    private val CHANNEL_ID = "music_channel"
+    private val NOTIFICATION_ID = 1
 
     override fun onCreate() {
         super.onCreate()
-        player = MediaPlayer.create(this, R.raw.song)
-        player.isLooping = false
+        mediaPlayer = MediaPlayer.create(this, R.raw.song)
+        mediaPlayer.isLooping = true
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        createNotificationChannel()
-
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Music Player")
-            .setContentText("Music is playing...")
-            .setSmallIcon(R.drawable.ic_launcher_background)
-            .build()
-
-        startForeground(1, notification)
-        player.start()
-
+        when (intent?.action) {
+            "STOP" -> {
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            "NEXT" -> {
+                // Пока просто игнорим, можно добавить переключение трека
+            }
+            else -> {
+                startForegroundServiceWithNotification()
+                mediaPlayer.start()
+            }
+        }
         return START_STICKY
     }
 
+    private fun startForegroundServiceWithNotification() {
+        createNotificationChannel()
+
+        val stopIntent = Intent(this, MyService::class.java).apply {
+            action = "STOP"
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val nextIntent = Intent(this, MyService::class.java).apply {
+            action = "NEXT"
+        }
+        val nextPendingIntent = PendingIntent.getService(
+            this, 1, nextIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Музыка играет 🎵")
+            .setContentText("Управляй прямо отсюда")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .addAction(0, "Next", nextPendingIntent)
+            .addAction(0, "Стоп", stopPendingIntent)
+            .setOngoing(true)
+            .build()
+
+        startForeground(NOTIFICATION_ID, notification)
+    }
+
+    private fun createNotificationChannel() {
+        val serviceChannel = NotificationChannel(
+            CHANNEL_ID,
+            "Музыкальный канал",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(serviceChannel)
+    }
+
     override fun onDestroy() {
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+        stopForeground(true) // Удаляет уведомление
         super.onDestroy()
-        player.stop()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Foreground Music Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(channel)
-        }
-    }
 }
