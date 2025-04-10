@@ -8,21 +8,26 @@
 
     <TextView
         android:id="@+id/textView"
-        android:text="This is MainActivity2"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:text=""
+        android:textSize="32sp"
+        android:gravity="center"
+        android:background="#EEEEEE"
+        android:padding="16dp"
+        android:textStyle="bold" />
+
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="START" />
 
     <Button
         android:id="@+id/stopButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STOP" />
-
+        android:text="STOP"
+        android:layout_marginTop="12dp" />
 </LinearLayout>
